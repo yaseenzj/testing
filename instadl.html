@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Reel Downloader - No API</title>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            max-width: 500px; margin: 40px auto; padding: 20px; 
+            background: #000; color: #fff; text-align: center;
+        }
+        .card { 
+            background: #111; border-radius: 16px; padding: 32px; 
+            box-shadow: 0 8px 32px rgba(255,255,255,0.1);
+        }
+        h1 { color: #fff; margin-bottom: 8px; }
+        .url-input { 
+            width: 100%; padding: 16px; border: 2px solid #333; 
+            border-radius: 12px; background: #222; color: #fff; 
+            font-size: 16px; margin-bottom: 20px;
+        }
+        .btn { 
+            padding: 16px 32px; background: #ff385c; color: white; 
+            border: none; border-radius: 12px; font-size: 16px; 
+            font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 20px;
+        }
+        .btn:hover { background: #e03131; }
+        .code-box { 
+            background: #1a1a1a; border: 1px solid #333; 
+            border-radius: 12px; padding: 20px; text-align: left; 
+            font-family: monospace; font-size: 14px; line-height: 1.5;
+            margin: 20px 0;
+        }
+        .copy-btn { 
+            background: #10b981; padding: 12px 24px; border: none; 
+            border-radius: 8px; color: white; cursor: pointer; font-size: 14px;
+        }
+        .steps { 
+            text-align: left; background: #222; padding: 20px; 
+            border-radius: 12px; margin-top: 20px;
+        }
+        .step { margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📱 Reel Downloader</h1>
+        <p>Extract Shortcode → Console Magic → HD Download</p>
+        
+        <input class="url-input" id="urlInput" placeholder="https://www.instagram.com/reel/ABC123456789/" />
+        <button class="btn" onclick="analyzeUrl()">🔍 Analyze URL</button>
+        
+        <div id="result"></div>
+        
+        <div class="code-box" id="consoleCode" style="display:none;">
+            <strong>🎯 Paste this in REEL PAGE CONSOLE (F12):</strong><br>
+            <div id="codeContent"></div>
+            <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
+        </div>
+        
+        <div class="steps">
+            <div class="step">1️⃣ Paste reel URL → Analyze</div>
+            <div class="step">2️⃣ Copy console code</div>
+            <div class="step">3️⃣ Open reel → F12 → Console → Paste & Enter</div>
+            <div class="step">4️⃣ ✅ Reel downloads instantly</div>
+        </div>
+    </div>
+
+    <script>
+        function analyzeUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            const result = document.getElementById('result');
+            const codeBox = document.getElementById('consoleCode');
+            const codeContent = document.getElementById('codeContent');
+            
+            if (!url) {
+                result.innerHTML = '<p style="color:#ef4444">Enter Instagram reel URL</p>';
+                return;
+            }
+            
+            const shortcodeMatch = url.match(/\/reel\/([A-Za-z0-9_-]{11})/);
+            if (!shortcodeMatch) {
+                result.innerHTML = '<p style="color:#ef4444">❌ Invalid reel URL. Must be /reel/ABC123... format</p>';
+                return;
+            }
+            
+            const shortcode = shortcodeMatch[1];
+            const reelUrl = `https://www.instagram.com/reel/${shortcode}/`;
+            
+            result.innerHTML = `
+                <p style="color:#10b981">✅ Shortcode: <strong>${shortcode}</strong></p>
+                <p>Reel URL: <a href="${reelUrl}" target="_blank" style="color:#60a5fa">${reelUrl}</a></p>
+                <p style="color:#f59e0b">👆 Click above → F12 Console → Paste code below</p>
+            `;
+            
+            const code = `(async()=>{` +
+                `console.log('🚀 Reel Downloader Active');` +
+                `for(let i=0;i<15;i++){` +
+                `await new Promise(r=>setTimeout(r,800));` +
+                `let src = document.querySelector('video source[src*="mp4"]')?.src || ` +
+                `document.querySelector('meta[property="og:video"]')?.content || ` +
+                `Array.from(document.querySelectorAll('video')).find(v=>v.currentSrc)?.currentSrc;` +
+                `if(src && src.includes('.mp4')){` +
+                `let a=document.createElement('a');` +
+                `a.href=src;a.download='instagram-reel-${Date.now()}.mp4';` +
+                `document.body.appendChild(a);a.click();document.body.removeChild(a);` +
+                `console.log('✅ Downloaded:',src);alert('🎉 HD Reel Downloaded!');return src;` +
+                `}` +
+                `}` +
+                `alert('📱 Scroll/play video then retry');` +
+                `})();`;
+            
+            codeContent.innerHTML = `<pre style="margin:0">${code}</pre>`;
+            codeBox.style.display = 'block';
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('codeContent').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('📋 Code copied! Go to reel page → F12 → Paste');
+            });
+        }
+        
+        // Enter key support
+        document.getElementById('urlInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') analyzeUrl();
+        });
+    </script>
+</body>
+</html>
